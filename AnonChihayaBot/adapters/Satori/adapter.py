@@ -170,7 +170,7 @@ class Adapter(BaseAdapter):
     # 连接建立时的回调函数
     def _on_open(self, ws: websocket.WebSocketApp) -> None:
         '''连接建立时的回调函数'''
-        info = f'[{self.get_connection})] 正在连接 WebSocket 服务器...'
+        info = f'[{self.get_connection}] 正在连接 WebSocket 服务器...'
         logger.info(info)
         print(info)
         self._identify(ws)
