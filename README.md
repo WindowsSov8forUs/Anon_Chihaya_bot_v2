@@ -1,11 +1,15 @@
 <p align="center">
     <img src="./logo.png" width="200" height="200">
 </p>
+
 <div align="center">
+
 # Anon_Chihaya_bot_v2
 
 **你好，我是爱音！**
+
 这是一个基于 NoneBot 框架编写的 python 同步-多线程机器人框架
+
 </div>
 
 ## 你好！
@@ -25,6 +29,7 @@
 **Anon_Chihaya_bot 框架**支持多实例配置（但是不推荐你使用），框架的配置文件位于框架同目录的 `config.yml` 文件中。打开该文件，进行配置设定。
 
 - **主人账号设置**
+
     在配置文件中，存在如下字段：
     ```yaml
     host_id: "123456"
@@ -32,6 +37,7 @@
     将该字段的值替换为你的 `账号 ID` 可以将所有的机器人实例的绝对管理员权限都交付与你。该项设置与机器人的 `/admin` 管理员操作功能和 `/ban` 屏蔽功能相关，因此只要能够获取到准确的 `账号 ID` ，都建议你进行配置。
 
 - **协议实例配置**
+
     **Anon_Chihaya_bot 框架**支持多实例配置，但是并不支持同时使用多协议。因此，在配置文件中，存在如下内容：
     ```yaml
     # 以下内容为针对 Satori 协议进行的配置
@@ -63,12 +69,17 @@
           platform: "exampleplatform" # Bot 所在平台
     ```
     其中 `Satori` 字段表示当框架运行在**Satori 协议**中时，将使用该字段内配置。对于具体的配置内容，**不同的协议**可能存在**不同的配置需求**，因此在配置时请参考各协议的文档，或根据你连接平台的方式进行配置。
+
     单协议内支持通过复制并修改字段内单项配置来启动多个实例，不同实例的配置内容**无先后顺序**关系。
+
     单实例配置中存在如下字段：
 
     - `version` 协议版本，对于部分协议可能不存在，目前对于 `Satori 协议` 只存在 `1` 值。
+
     - `WebSocket` 字段内配置 WebSocket 连接所需参数，若需要通过 `WebSocket 服务` 连接，则需要配置该字段。
+
     - `WebHook_Client` 字段内配置 HTTP POST 推送所需参数，若需要通过框架自主建立 `WebHook 服务` 连接，则需要配置该字段。
+
     - `WebHook_Server` 字段内配置 HTTP WebHook 服务所需参数，若需要通过 `WebHook 服务` 连接，则需要配置该字段。
 
     >字段内配置对于不同协议可能存在变化，因此请参考配置文件内注释进行配置。
@@ -91,6 +102,7 @@ while True:
 ```
 
 在脚本中，我们通过 `AnonChihayaBot.run()` 方法启动框架，并通过 `app.stop()` 方法停止框架。
+
 启动后， **Anon_Chihaya_bot 框架** 将会通过 `WebSocket 服务` 连接至 `Satori 协议`，并通过 `HTTP 服务` 发送消息。对于 `AnonChihayaBot.run()` 方法，它的定义如下：
 ```python
 # AnonChihayaBot 运行方法
