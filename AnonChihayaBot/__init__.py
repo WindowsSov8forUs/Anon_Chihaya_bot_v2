@@ -10,8 +10,6 @@ from AnonChihayaBot.adapters import Adapter
 from AnonChihayaBot.adapters.Satori import Config as SatoriConfig
 from AnonChihayaBot.adapters.Satori import Adapter as SatoriAdapter
 
-bots = []
-
 # AnonChihayaBot 类
 class AnonChihayaBot():
     '''AnonChihayaBot 类'''
