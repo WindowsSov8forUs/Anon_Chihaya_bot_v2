@@ -17,8 +17,12 @@ class AnonChihayaBot():
     '''AnonChihayaBot 类'''
     serve: Literal['WebSocket', 'WebHook', 'Dev']
     '''实例所启用的服务种类'''
-    adapters: list[Adapter] = []
-    '''实例所包括的所有 Bot 线程'''
+    # 初始化方法
+    def __init__(self) -> None:
+        '''初始化方法'''
+        self.adapters: list[Adapter] = []
+        '''实例所包括的所有 Bot 线程'''
+        return
     # AnonChihayaBot 运行方法
     @classmethod
     def run(
@@ -54,8 +58,8 @@ class AnonChihayaBot():
     def handle(self, request: str) -> None:
         '''处理 request
             示例：
-            ```
-            app.handle(request.get_json())
+            ```python
+            AnonChohayaBot.handle(request.get_json())
             ```
 
         参数:

@@ -180,6 +180,9 @@ class Adapter(BaseAdapter):
     def _on_message(self, ws: websocket.WebSocketApp, message: Any) -> None:
         '''收到消息时的回调函数'''
         payload: dict[str, Any] = json.loads(message) # 转换为字典类型
+        # 内部直接过滤来自平台 'qq' 的事件
+        if payload['body'].get('platform', None) == 'qq':
+            return
         if self.config.webhook_url is not None:
             try:
                 self.webhook_client.post(
@@ -188,12 +191,10 @@ class Adapter(BaseAdapter):
                 )
             except Exception as exception:
                 print(f'本次 Webhook 推送失败：{type(exception).__name__}: {exception}')
+            return
         else:
-            # 内部直接过滤来自平台 'qq' 的事件
-            if payload['body'].get('platform', None) == 'qq':
-                return
             self._handle_payload(payload)
-        return
+            return
     
     # 连接关闭时的回调函数
     def _on_close(self, ws: websocket.WebSocketApp) -> None:
@@ -273,15 +274,14 @@ class Adapter(BaseAdapter):
             )
             Thread(target=adapter._connect).start()
         elif serve == 'WebHook': # 配置 WebHook 机器人对象
-            for account in config.accounts:
-                try:
-                    bot = Bot.verify(adapter, account.id, account.platform, config)
-                except Exception as exception:
-                    print(f'{type(exception).__name__}: {exception}')
-                    continue
-                adapter.bots[account.id] = bot
-            if len(adapter.bots) == 0:
-                raise ValueError(f'没有机器人账号得到验证。')
+            if config.webhook_url is not None:
+                # 创建 Webhook 客户端实例
+                adapter.webhook_client = httpx.Client(
+                    base_url='{}'.format(
+                        config.webhook_url
+                    )
+                )
+            return adapter
         if serve == 'Dev':
             if config.webhook_url is not None:
                 # 创建 Webhook 客户端实例
@@ -296,21 +296,49 @@ class Adapter(BaseAdapter):
     @override
     def handle_request(self, request: str) -> None:
         payload: dict[str, Any] = json.loads(request)
-        if len(self.bots) <= 0: # 如果没有 Bot 实例
-            for account in self.config.accounts:
-                try:
-                    bot = Bot.verify(self, account.id, account.platform, self.config)
-                except Exception as exception:
-                    print(f'{type(exception).__name__}: {exception}')
-                    continue
-                self.bots[account.id] = bot
-            if len(self.bots) <= 0:
-                print('没有机器人账号得到验证。')
+        if payload['op'] == 0: # 事件信令
+            try:
+                signaling = EventSignaling.model_validate(payload)
+            except Exception as exception:
+                print(f'{type(exception).__name__}: {exception}')
                 return
-            else:
-                self._handle_payload(payload)
+        elif payload['op'] == 2: # 心跳回复信令
+            signaling = Pong.model_validate(payload)
+        elif payload['op'] == 4: # 鉴权回复信令
+            signaling = Ready.model_validate(payload)
         else:
-            self._handle_payload(payload)
+            print('未知的信令类型：{}'.format(payload['op']))
+            return
+        # 分情况处理信令
+        if isinstance(signaling, Pong):
+            pass
+        elif isinstance(signaling, Ready):
+            logins = signaling.body.logins
+            self._bot_connect(logins)
+        else:
+            try:
+                event = self.payload_to_event(signaling.body)
+            except Exception as exception:
+                print(f'{type(exception).__name__}: {exception}')
+                return
+            # 获取接收事件对应的机器人实例
+            if event.self_id in self.bots.keys():
+                bot = self.bots[event.self_id]
+            # 如果没有则创建一个机器人并添加
+            else:
+                try:
+                    bot = Bot.verify(
+                        self,
+                        event.self_id,
+                        event.platform,
+                        self.config
+                    )
+                    self.bots[event.self_id] = bot
+                except Exception as exception:
+                    print(f'机器人 {event.self_id} 验证失败：{type(exception).__name__}: {exception}')
+                    return
+            # 创建并运行一个子线程，处理事件（既然没有返回值那就不需要等待了罢！
+            Thread(target=bot.handle_event, args=(event,), daemon=True).start()
         return
     
     # 当前适配器名称

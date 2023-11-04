@@ -4,7 +4,7 @@
 ############################
 # 配置机器人的主人账号
 # 将你自己的账号填入这里
-host_id: "123456"
+host_id: ""
 
 # 以下内容为针对 Satori 协议进行的配置
 # Anon Chihaya Bot 默认选用该协议启动
@@ -16,8 +16,8 @@ Satori:
     WebSocket:
       ip: "127.0.0.1" # 进行连接的 WebSocket 所在服务器 IP，本地启动则填入 127.0.0.1
       port: 5140 # 进行连接的端口
-      path: "/satori" # 进行连接的路径，若不需要则可以置空
-      token: "exampletoken" # 进行鉴权需要的 token
+      path: "/" # 进行连接的路径，若不需要则可以置空
+      token: "" # 进行鉴权需要的 token
       heartbeat_interval: 5 # 心跳时间间隔，单位为秒，设置时间 < 10s
     # 框架自主进行 HTTP POST 推送所需配置 (可选配置)
     WebHook_Client:
@@ -28,11 +28,8 @@ Satori:
     WebHook_Server:
       ip: "127.0.0.1" # Satori 协议运行所在地址 IP，本地运行则填入 127.0.0.1
       port: 5140 # 进行连接的端口
-      path: "/satori" # 进行连接的路径，若不需要则可以置空
-      token: "exampletoken" # 进行鉴权需要的 token
-      accounts: # Bot 账号配置
-        - id: "123456" # Bot ID
-          platform: "exampleplatform" # Bot 所在平台
+      path: "/" # 进行连接的路径，若不需要则可以置空
+      token: "" # 进行鉴权需要的 token
 
   #- version: 1
   #  WebSocket:
@@ -50,6 +47,3 @@ Satori:
   #    port: 8800
   #    path: "/"
   #    token: ""
-  #    accounts: # Bot 账号配置
-  #      - id: "" # Bot ID
-  #        platform: "" # Bot 所在平台
