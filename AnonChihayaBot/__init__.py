@@ -15,11 +15,11 @@ bots = []
 # AnonChihayaBot 类
 class AnonChihayaBot():
     '''AnonChihayaBot 类'''
-    serve: Literal['WebSocket', 'WebHook', 'Dev']
-    '''实例所启用的服务种类'''
     # 初始化方法
-    def __init__(self) -> None:
+    def __init__(self, serve: Literal['WebSocket', 'WebHook', 'Dev']) -> None:
         '''初始化方法'''
+        self.serve: Literal['WebSocket', 'WebHook', 'Dev'] = serve
+        '''实例所启用的服务种类'''
         self.adapters: list[Adapter] = []
         '''实例所包括的所有 Bot 线程'''
         return
@@ -42,7 +42,7 @@ class AnonChihayaBot():
         返回:
             AnonChihayaBot: AnonChihayaBot 实例
         '''
-        anon_app = cls()
+        anon_app = cls(serve)
         anon_app.serve = serve
         if protocol == 'Satori': # 使用 Satori 协议
             config = SatoriConfig.from_yaml(serve)
