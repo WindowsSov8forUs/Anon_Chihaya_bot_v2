@@ -195,20 +195,20 @@ class MessageSegment(BaseMessageSegment['Message']):
         timeout: Optional[str]=None
     ) -> 'Image':
         if isinstance(src, str): # 是图片 URL
-            data: ImageData = {'src': src}
+            data: ImageData = {'url': src}
         elif isinstance(src, Path): # 是路径
-            data: ImageData = {'src': src.as_uri()}
-        elif isinstance(src, SrcData): # 是图片资源对象
+            data: ImageData = {'url': src.as_uri()}
+        elif isinstance(src, dict): # 是图片资源对象
             if isinstance(src['data'], BytesIO):
                 src['data'] = src['data'].getvalue()
             data: ImageData = {
-                'src': f'data:{src["mime_type"]};base64,{b64encode(src["data"]).decode()}'
+                'url': f'data:{src["mime_type"]};base64,{b64encode(src["data"]).decode("utf-8")}'
             }
         if cache is not None:
             data['cache'] = cache
         if timeout is not None:
             data['timeout'] = timeout
-        return Image('img', data)
+        return Image('image', data)
     
     # 语音
     @staticmethod
@@ -265,14 +265,14 @@ class MessageSegment(BaseMessageSegment['Message']):
         timeout: Optional[str]=None
     ) -> 'Audio':
         if isinstance(src, str): # 是音频 URL
-            data: AudioData = {'src': src}
+            data: AudioData = {'url': src}
         elif isinstance(src, Path): # 是路径
-            data: AudioData = {'src': src.as_uri()}
+            data: AudioData = {'url': src.as_uri()}
         elif isinstance(src, SrcData): # 是音频资源对象
             if isinstance(src['data'], BytesIO):
                 src['data'] = src['data'].getvalue()
             data: AudioData = {
-                'src': f'data:{src["mime_type"]};base64,{b64encode(src["data"]).decode()}'
+                'url': f'data:{src["mime_type"]};base64,{b64encode(src["data"]).decode()}'
             }
         if cache is not None:
             data['cache'] = cache
@@ -335,14 +335,14 @@ class MessageSegment(BaseMessageSegment['Message']):
         timeout: Optional[str]=None
     ) -> 'Video':
         if isinstance(src, str): # 是音频 URL
-            data: VideoData = {'src': src}
+            data: VideoData = {'url': src}
         elif isinstance(src, Path): # 是路径
-            data: VideoData = {'src': src.as_uri()}
+            data: VideoData = {'url': src.as_uri()}
         elif isinstance(src, SrcData): # 是音频资源对象
             if isinstance(src['data'], BytesIO):
                 src['data'] = src['data'].getvalue()
             data: VideoData = {
-                'src': f'data:{src["mime_type"]};base64,{b64encode(src["data"]).decode()}'
+                'url': f'data:{src["mime_type"]};base64,{b64encode(src["data"]).decode()}'
             }
         if cache is not None:
             data['cache'] = cache
@@ -405,14 +405,14 @@ class MessageSegment(BaseMessageSegment['Message']):
         timeout: Optional[str]=None
     ) -> 'File':
         if isinstance(src, str): # 是音频 URL
-            data: FileData = {'src': src}
+            data: FileData = {'url': src}
         elif isinstance(src, Path): # 是路径
-            data: FileData = {'src': src.as_uri()}
+            data: FileData = {'url': src.as_uri()}
         elif isinstance(src, SrcData): # 是音频资源对象
             if isinstance(src['data'], BytesIO):
                 src['data'] = src['data'].getvalue()
             data: FileData = {
-                'src': f'data:{src["mime_type"]};base64,{b64encode(src["data"]).decode()}'
+                'url': f'data:{src["mime_type"]};base64,{b64encode(src["data"]).decode()}'
             }
         if cache is not None:
             data['cache'] = cache
@@ -721,7 +721,7 @@ class Link(MessageSegment):
 # 图片数据
 class ImageData(TypedDict):
     '''图片数据'''
-    src: str
+    url: str
     '''资源的 URL'''
     cache: NotRequired[bool]
     '''是否使用已缓存的文件'''
@@ -748,7 +748,7 @@ class Image(MessageSegment):
 # 语音数据
 class AudioData(TypedDict):
     '''语音数据'''
-    src: str
+    url: str
     '''资源的 URL'''
     cache: NotRequired[bool]
     '''是否使用已缓存的文件'''
@@ -771,7 +771,7 @@ class Audio(MessageSegment):
 # 视频数据
 class VideoData(TypedDict):
     '''视频数据'''
-    src: str
+    url: str
     '''资源的 URL'''
     cache: NotRequired[bool]
     '''是否使用已缓存的文件'''
@@ -794,7 +794,7 @@ class Video(MessageSegment):
 # 文件数据
 class FileData(TypedDict):
     '''文件数据'''
-    src: str
+    url: str
     '''资源的 URL'''
     cache: NotRequired[bool]
     '''是否使用已缓存的文件'''
