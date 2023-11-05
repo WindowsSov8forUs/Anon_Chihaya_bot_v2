@@ -14,13 +14,13 @@ def str_cut_out(
 ) -> str:
     '''以指定字符串为始终点切割字符串
 
-    Args:
+    参数:
         str (str): 要切割的字符串
         str_begin (str, optional): 起始标志字符串。若留空则表示从字符串的开头开始切割
         str_end (str, optional): 终止标志字符串。若留空则表示从字符串的结尾开始切割
         type_ (bool, optional): 切割方式标识。True 表示保留标志字符串，False 表示不保留标志字符串，默认为 True
 
-    Returns:
+    返回:
         str: 得到的字符串，若没有要提取的字符串则返回一个空字符串
     '''
     # 检测起始点
@@ -57,7 +57,7 @@ def str_remove(
 ) -> str:
     '''以指定字符串为始终点切除字符串
 
-    Args:
+    参数:
         str (str): 要切除的字符串
         str_begin (str, optional): 起始标志字符串。若留空则表示从字符串的开头开始切除
         str_end (str, optional): 终止标志字符串。若留空则表示切除到字符串的结尾
@@ -66,7 +66,7 @@ def str_remove(
     Raises:
         ValueError: 要切除的字符串不存在
 
-    Returns:
+    返回:
         str: 得到的字符串
     '''
     # 检测起始点
@@ -96,12 +96,12 @@ def str_remove(
 def break_line(line_get: str, width_limit: int, font: ImageFont.FreeTypeFont) -> str:
     '''换行切割字符串，输入需要切割的字符串及每行限制长度，返回切割后的字符串
 
-    Args:
+    参数:
         line_get (str): 需要切割的字符串
         width_limit (int): 每行限制像素长度
         font (ImageFont.FreeTypeFont): 使用的字体 `PIL.ImageFont.FreeTypeFont`
 
-    Returns:
+    返回:
         str: 切割后的字符串
     '''
     TABLE_WIDTH = 4
