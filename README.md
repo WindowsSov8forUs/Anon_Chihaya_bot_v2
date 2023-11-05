@@ -64,9 +64,6 @@
         port: 5140 # 进行连接的端口
         path: "/satori" # 进行连接的路径，若不需要则可以置空
         token: "exampletoken" # 进行鉴权需要的 token
-        accounts: # Bot 账号配置
-        - id: "123456" # Bot ID
-          platform: "exampleplatform" # Bot 所在平台
     ```
     其中 `Satori` 字段表示当框架运行在**Satori 协议**中时，将使用该字段内配置。对于具体的配置内容，**不同的协议**可能存在**不同的配置需求**，因此在配置时请参考各协议的文档，或根据你连接平台的方式进行配置。
 
