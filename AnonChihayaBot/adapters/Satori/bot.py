@@ -257,52 +257,54 @@ class Bot(BaseBot):
                 return
         if event_filter(self, event):
             # 判断是否为帮助
-            if (message := str(event.get_message())).startswith('/help'):
-                if message == '/help':
-                    reply = 'Bot 可用的插件有：'
-                    plugin_bans = Ban._get_info().plugin.get(event.get_guild_id(), [])
-                    for plg in plugin.plugins:
-                        if plg.package_name in plugin_bans:
-                            reply += '\n>> [BANNED] '
-                        else:
-                            reply += '\n>> '
-                        reply += f'{plg.name}: {plg.doc}'
-                    self.send(event, reply + '\n发送 /help + 名称 获取对应帮助。')
-                    return
-                else:
-                    plugin_name = message[5:].strip()
-                    try: # 查找插件
-                        plg = plugin.find_plugin(plugin_name)
-                        reply = f'[{plg.name}]\n{plg.doc}'
-                        for function in plg.functions:
-                            reply += f'\n>> {function.name}: {function.desc}'
+            if isinstance(event, MessageEvent):
+                if (message := str(event.get_message())).startswith('/help'):
+                    if message == '/help':
+                        reply = 'Bot 可用的插件有：'
+                        plugin_bans = Ban._get_info().plugin.get(event.get_guild_id(), [])
+                        for plg in plugin.plugins:
+                            if plg.package_name in plugin_bans:
+                                reply += '\n>> [BANNED] '
+                            else:
+                                reply += '\n>> '
+                            reply += f'{plg.name}: {plg.doc}'
                         self.send(event, reply + '\n发送 /help + 名称 获取对应帮助。')
                         return
-                    except ValueError:
-                        # 创建帮助任务
-                        tasks: list[Thread] = []
-                        for plg in plugin.plugins:
-                            for func in plg.functions:
-                                tasks.append(
-                                    Thread(target=func.function, args=(self, event), daemon=True)
-                                )
+                    else:
+                        plugin_name = message[5:].strip()
+                        try: # 查找插件
+                            plg = plugin.find_plugin(plugin_name)
+                            reply = f'[{plg.name}]\n{plg.doc}'
+                            for function in plg.functions:
+                                reply += f'\n>> {function.name}: {function.desc}'
+                            self.send(event, reply + '\n发送 /help + 名称 获取对应帮助。')
+                            return
+                        except ValueError:
+                            # 创建帮助任务
+                            tasks: list[Thread] = []
+                            for plg in plugin.plugins:
+                                for func in plg.functions:
+                                    tasks.append(
+                                        Thread(target=func.function, args=(self, event), daemon=True)
+                                    )
+                            
+                            for task in tasks:
+                                task.start()
+                            return
                         
-                        for task in tasks:
-                            task.start()
-                        return
-                    
-            if (
-                str(event.get_message()).lower() == '/reload'
-                and event.get_user_id() == self.config.host_id
-            ):
-                try:
-                    _schedule_kill()
-                    plugin._plugin_reload()
-                    _schedule_run(self)
-                    self.send(event, '<√> 插件已更新。')
-                except Exception as exception:
-                    self.send(event, f'<×> 插件更新失败：\n{type(exception).__name__}: {exception}')
-                return
+                if (
+                    str(event.get_message()).lower() == '/reload'
+                    and event.get_user_id() == self.config.host_id
+                ):
+                    try:
+                        _schedule_kill()
+                        plugin._plugin_reload()
+                        _schedule_run(self)
+                        self.send(event, '<√> 插件已更新。')
+                    except Exception as exception:
+                        self.send(event, f'<×> 插件更新失败：\n{type(exception).__name__}: {exception}')
+                    return
+            
             # 创建任务列表
             tasks: list[Thread] = []
             for plg in plugin.plugins:
