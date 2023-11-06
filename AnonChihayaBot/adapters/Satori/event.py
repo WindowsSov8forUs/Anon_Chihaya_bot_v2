@@ -256,6 +256,16 @@ class LoginEvent(NoticeEvent):
     '''登录事件'''
     login: Login
     '''事件的登录信息'''
+    # 获取事件日志信息
+    @override
+    def get_log(self) -> str:
+        log = f'[{self.__type__}]机器人 '
+        if self.login.user is not None:
+            log += f'{self.login.user.name} ({self.login.user.id})'
+        else:
+            log += 'None'
+        log += f' 在平台 {self.login.platform} 上的状态发生更新：{self.login.status.name}'
+        return log
 
 # 登录被创建事件
 @register_event_class
