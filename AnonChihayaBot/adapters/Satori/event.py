@@ -259,7 +259,7 @@ class LoginEvent(NoticeEvent):
     # 获取事件日志信息
     @override
     def get_log(self) -> str:
-        log = f'[{self.__type__}]机器人 '
+        log = f'[{self.__type__.value}] 机器人 '
         if self.login.user is not None:
             log += f'{self.login.user.name} ({self.login.user.id})'
         else:

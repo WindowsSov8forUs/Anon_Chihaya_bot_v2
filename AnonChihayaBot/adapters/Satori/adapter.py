@@ -15,12 +15,17 @@ from AnonChihayaBot.adapters import Adapter as BaseAdapter
 
 from .bot import Bot
 from .config import Config
-from .event import Event, EVENT_CLASSES
 from .models import Event as SatoriEvent
+from .event import (
+    Event,
+    LoginEvent, LoginAddedEvent, LoginRemovedEvent, LoginUpdatedEvent,
+    EVENT_CLASSES
+)
 from .models import (
     Identify, IdentifyBody,
     Ping, Ready, EventSignaling, Pong,
-    Login)
+    Login
+)
 
 # 适配器类型
 class Adapter(BaseAdapter):
@@ -139,6 +144,7 @@ class Adapter(BaseAdapter):
             try:
                 signaling = EventSignaling.model_validate(payload)
             except Exception as exception:
+                print(payload)
                 print(f'{type(exception).__name__}: {exception}')
                 return
         elif payload['op'] == 2: # 心跳回复信令
@@ -159,6 +165,12 @@ class Adapter(BaseAdapter):
                 event = self.payload_to_event(signaling.body)
             except Exception as exception:
                 print(f'{type(exception).__name__}: {exception}')
+                logger.warning(f'将 payload 转换为事件时出错：{type(exception).__name__}: {exception}')
+                logger.error(exception)
+                return
+            # 处理 LoginEvent
+            if isinstance(event, LoginEvent):
+                self._handle_login(event)
                 return
             # 获取接收事件对应的机器人实例
             if event.self_id in self.bots.keys():
@@ -166,6 +178,28 @@ class Adapter(BaseAdapter):
                 # 创建并运行一个子线程，处理事件（既然没有返回值那就不需要等待了罢！
                 Thread(target=bot.handle_event, args=(event,), daemon=True).start()
         return
+    
+    # 处理接收到的 LoginEvent
+    def _handle_login(self, event: LoginEvent) -> None:
+        '''处理接收到的 LoginEvent'''
+        print(event.get_log())
+        logger.info(event.get_log())
+        login = event.login
+        if isinstance(event, LoginAddedEvent):
+            # 登录信息添加
+            if login.user is not None:
+                if login.user.id not in self.bots.keys():
+                    self._bot_connect([login])
+        elif isinstance(event, LoginUpdatedEvent):
+            # 登录信息更新
+            if login.user is not None:
+                if login.user.id not in self.bots.keys():
+                    self._bot_connect([login])
+        elif isinstance(event, LoginRemovedEvent):
+            # 登录信息删除
+            if login.user is not None:
+                if login.user.id in self.bots.keys():
+                    del self.bots[login.user.id]
     
     # 连接建立时的回调函数
     def _on_open(self, ws: websocket.WebSocketApp) -> None:
@@ -320,6 +354,12 @@ class Adapter(BaseAdapter):
                 event = self.payload_to_event(signaling.body)
             except Exception as exception:
                 print(f'{type(exception).__name__}: {exception}')
+                logger.warning(f'将 payload 转换为事件时出错：{type(exception).__name__}: {exception}')
+                logger.error(exception)
+                return
+            # 处理 LoginEvent
+            if isinstance(event, LoginEvent):
+                self._handle_login(event)
                 return
             # 获取接收事件对应的机器人实例
             if event.self_id in self.bots.keys():
