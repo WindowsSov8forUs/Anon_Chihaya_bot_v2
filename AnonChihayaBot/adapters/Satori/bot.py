@@ -274,10 +274,14 @@ class Bot(BaseBot):
                         plugin_name = message[5:].strip()
                         try: # 查找插件
                             plg = plugin.find_plugin(plugin_name)
-                            reply = f'[{plg.name}]\n{plg.doc}'
-                            for function in plg.functions:
-                                reply += f'\n>> {function.name}: {function.desc}'
-                            self.send(event, reply + '\n发送 /help + 名称 获取对应帮助。')
+                            if len(plg.functions) > 1: # 如果不止一个功能
+                                reply = f'[{plg.name}]\n{plg.doc}'
+                                for function in plg.functions:
+                                    reply += f'\n>> {function.name}: {function.desc}'
+                                self.send(event, reply + '\n发送 /help + 名称 获取对应帮助。')
+                            else:
+                                func = plg.functions[0]
+                                reply = f'[{func.name}]\n{func.help_doc}'
                             return
                         except ValueError:
                             # 创建帮助任务

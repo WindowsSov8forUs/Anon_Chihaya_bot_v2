@@ -273,7 +273,14 @@ class Logging:
 class Function():
     '''功能信息类'''
     # 初始化
-    def __init__(self, inner_name: str, name: str, desc: str, function: FunctionLike) -> None:
+    def __init__(
+        self,
+        inner_name: str,
+        name: str,
+        desc: str,
+        help_doc: str,
+        function: FunctionLike
+    ) -> None:
         '''功能信息类
 
         参数:
@@ -288,6 +295,8 @@ class Function():
         '''功能名'''
         self.desc: str = desc
         '''功能简介'''
+        self.help_doc: str = help_doc
+        '''功能帮助'''
         self.function: FunctionLike = function
         '''功能函数'''
 
@@ -415,6 +424,7 @@ def plugin_register(
                 function_name,
                 outer_name,
                 desc if desc is not None else outer_name,
+                help_doc,
                 inner_function
             )
         )
