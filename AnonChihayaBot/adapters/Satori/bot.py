@@ -282,6 +282,7 @@ class Bot(BaseBot):
                             else:
                                 func = plg.functions[0]
                                 reply = f'[{func.name}]\n{func.help_doc}'
+                                self.send(event, reply)
                             return
                         except ValueError:
                             # 创建帮助任务
