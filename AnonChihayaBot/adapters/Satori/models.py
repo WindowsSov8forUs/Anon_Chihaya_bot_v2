@@ -145,6 +145,8 @@ class Message(BaseModel):
     '''消息'''
     id: str
     '''消息 ID'''
+    quote: Optional['Message']=None
+    '''引用消息'''
     content: list[Element]
     '''消息内容'''
     channel: Optional[Channel]=None
@@ -165,6 +167,16 @@ class Message(BaseModel):
         '''验证是否存在 `content` 字段'''
         if isinstance(values, str): # 这种情况下，只会收到 Message.id
             return {'id': values, 'content': 'Unknown'}
+        if (quote := values.get('quote', None)) is not None:
+            # 如果有引用消息
+            if not isinstance(content := values.get('content', None), list):
+                # 表明未进行过验证
+                if (id_ := quote.get('id', None)) is not None:
+                    values['content'] = (
+                        f'<quote id="{id_}" forward/>' + (
+                            content if content is not None else ''
+                        )
+                    )
         if 'content' in values: # 如果存在
             return values
         print('收到一个不存在 content 的消息。')
