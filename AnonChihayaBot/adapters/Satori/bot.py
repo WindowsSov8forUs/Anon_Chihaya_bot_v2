@@ -48,7 +48,7 @@ def _check_reply(bot: 'Bot', event: MessageEvent) -> None:
         del message[index]
     if len(message) > index and message[index].type == 'text':
         message[index].data['text'] = message[index].data['text'].lstrip()
-        if message[index].data['index'] == '':
+        if message[index].data['text'] == '':
             del message[index]
     if not message:
         message.append(MessageSegment.text(''))
