@@ -982,11 +982,9 @@ class RenderMessage(MessageSegment):
         if 'content' not in self.data:
             return f'<{self.type} {" ".join(attr)}/>'
         else:
-            return '<{} {}>{}</{}>'.format(
-                self.type,
-                ' '.join(attr),
-                self.data['content'],
-                self.type
+            return (
+                f'<{self.type}>{self.data["content"]}</{self.type}>' if len(attr) <= 0
+                else f'<{self.type} {" ".join(attr)}>{self.data["content"]}</{self.type}>'
             )
     
     # 日志字符串
@@ -1018,6 +1016,19 @@ class Author(MessageSegment):
     '''作者'''
     data: AuthorData
     '''作者数据'''
+    # 将消息段转换为 HTML 字符串
+    def __str__(self) -> str:
+        '''将消息段转换为 HTML 字符串'''
+        # 转换消息段中的数据为属性
+        def _attr(key: str, value: str) -> str:
+            '''获取 HTML 属性字符串'''
+            if key == 'id':
+                key = 'user-id'
+            return f'{key}="{escape(str(value))}"'
+        
+        attrs = ' '.join(_attr(key, str(value)) for key, value in self.data.items())
+        return f'<{self.type} {attrs}/>'
+    
     # 日志字符串
     @override
     def get_log(self) -> str:
